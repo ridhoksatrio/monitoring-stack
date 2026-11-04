@@ -45,7 +45,7 @@ Sistem memantau daya optik (Rx Power) pada pelanggan FTTH. Ketika sinyal turun d
 
 | Kondisi Normal (-20 dBm) | Simulasi Gangguan (-31.5 dBm) |
 | :---: | :---: |
-| <img src="screenshots/P1-20-grafana-overview-normal.png" width="450" alt="Dashboard kondisi normal"> | <img src="screenshots/P1-21-grafana-overview-incident.png" width="450" alt="Dashboard saat gangguan"> |
+| <img src="screenshots/P1-20-graph-overview-normal.png" width="450" alt="Dashboard kondisi normal"> | <img src="screenshots/P1-21-graph-overview-incident.png" width="450" alt="Dashboard saat gangguan"> |
 | Sinyal stabil, tidak ada alarm. | Sinyal turun drastis, alarm Warning/High terpicu. |
 
 ### 2. Notifikasi Telegram
