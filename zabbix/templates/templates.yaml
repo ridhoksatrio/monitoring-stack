@@ -1,0 +1,96 @@
+zabbix_export:
+  version: '7.0'
+  template_groups:
+    - uuid: 11111111111111111111111111111111
+      name: 'NOC/B2B'
+    - uuid: 22222222222222222222222222222222
+      name: 'NOC/FTTH'
+    - uuid: 33333333333333333333333333333333
+      name: 'NOC/IPTV'
+  templates:
+    - uuid: 44444444444444444444444444444444
+      template: 'Template NOC B2B SLA'
+      name: 'Template NOC B2B SLA'
+      groups:
+        - name: 'NOC/B2B'
+      items:
+        - uuid: 55555555555555555555555555555551
+          name: 'ICMP ping'
+          key: 'icmpping[,3]'
+          delay: 30s
+          type: SIMPLE
+          value_type: UNSIGNED
+        - uuid: 55555555555555555555555555555552
+          name: 'Packet loss %'
+          key: 'icmppingloss[,10]'
+          delay: 1m
+          type: SIMPLE
+          value_type: FLOAT
+        - uuid: 55555555555555555555555555555553
+          name: 'Response time'
+          key: 'icmppingsec[,10]'
+          delay: 1m
+          type: SIMPLE
+          value_type: FLOAT
+        - uuid: 55555555555555555555555555555554
+          name: 'Jitter (stddev 5m)'
+          key: 'b2b.jitter'
+          type: CALCULATED
+          value_type: FLOAT
+          params: 'stddevsamp(/Template NOC B2B SLA/icmppingsec,5m)*1000'
+          delay: 1m
+        - uuid: 55555555555555555555555555555555
+          name: 'Availability 24 jam %'
+          key: 'b2b.avail24h'
+          type: CALCULATED
+          value_type: FLOAT
+          params: 'avg(/Template NOC B2B SLA/icmpping,24h)*100'
+          delay: 1m
+      triggers:
+        - uuid: 66666666666666666666666666666661
+          expression: 'max(/Template NOC B2B SLA/icmpping[,3],#3)=0'
+          recovery_mode: RECOVERY_EXPRESSION
+          recovery_expression: 'max(/Template NOC B2B SLA/icmpping[,3],#3)=1'
+          name: 'B2B {HOST.NAME}: link down'
+          priority: HIGH
+        - uuid: 66666666666666666666666666666662
+          expression: 'avg(/Template NOC B2B SLA/icmppingloss[,10],5m)>2'
+          name: 'B2B {HOST.NAME}: packet loss tinggi'
+          priority: WARNING
+        - uuid: 66666666666666666666666666666663
+          expression: 'avg(/Template NOC B2B SLA/icmppingsec[,10],5m)>0.1'
+          name: 'B2B {HOST.NAME}: latency tinggi'
+          priority: WARNING
+        - uuid: 66666666666666666666666666666664
+          expression: 'last(/Template NOC B2B SLA/b2b.avail24h)<99.5'
+          name: 'B2B {HOST.NAME}: SLA berisiko'
+          priority: HIGH
+    - uuid: 77777777777777777777777777777777
+      template: 'Template NOC FTTH'
+      name: 'Template NOC FTTH'
+      groups:
+        - name: 'NOC/FTTH'
+      items:
+        - uuid: 88888888888888888888888888888881
+          name: 'ONT Rx power (dBm)'
+          key: 'ont.rx_power'
+          type: ZABBIX_TRAPPER
+          value_type: FLOAT
+        - uuid: 88888888888888888888888888888882
+          name: 'ONT status (1=online, 0=LOS)'
+          key: 'ont.status'
+          type: ZABBIX_TRAPPER
+          value_type: UNSIGNED
+      triggers:
+        - uuid: 99999999999999999999999999999991
+          expression: 'avg(/Template NOC FTTH/ont.rx_power,3m)<-27'
+          name: 'ONT {HOST.NAME}: redaman tinggi'
+          priority: WARNING
+        - uuid: 99999999999999999999999999999992
+          expression: 'avg(/Template NOC FTTH/ont.rx_power,3m)<-30'
+          name: 'ONT {HOST.NAME}: redaman kritis'
+          priority: HIGH
+        - uuid: 99999999999999999999999999999993
+          expression: 'max(/Template NOC FTTH/ont.status,#2)=0'
+          name: 'ONT {HOST.NAME}: LOS'
+          priority: HIGH
