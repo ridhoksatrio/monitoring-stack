@@ -102,12 +102,16 @@ Saat gangguan terdeteksi, bot mengirim notifikasi ke grup NOC. Setelah gangguan 
 ```bash
 git clone https://github.com/ridhoksatrio/monitoring-stack.git
 cd monitoring-stack
+cp .env.example .env      # lalu ubah POSTGRES_PASSWORD
 docker compose up -d
 ```
 
-Setelah seluruh container berjalan, akses Zabbix Web UI melalui browser dan lanjutkan konfigurasi host, template, serta media type Telegram.
+Zabbix Web UI tersedia di `http://localhost:8081`. Kredensial bawaan Zabbix adalah `Admin` / `zabbix`; ganti password setelah login pertama.
 
-## Penulis
+Setelah seluruh container berjalan, import template dari folder `zabbix/templates/`, daftarkan host, lalu konfigurasikan media type Telegram dengan token bot dan chat ID Anda sendiri.
 
-**Ridho K. Satrio**
-GitHub: [@ridhoksatrio](https://github.com/ridhoksatrio)
+## Batasan
+
+- Data OLT dan ONT dihasilkan oleh simulator Python, bukan perangkat fisik.
+- Lingkungan ini ditujukan untuk lab: komunikasi antar komponen tidak dienkripsi dan belum ada high availability maupun backup database.
+- Image Zabbix memakai tag `ubuntu-7.0-latest`; untuk penggunaan produksi, versi sebaiknya dikunci.
